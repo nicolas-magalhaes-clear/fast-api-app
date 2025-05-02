@@ -1,18 +1,24 @@
-from app.models.user import User
-import jwt
+from jwt import encode, ExpiredSignatureError, PyJWTError, decode # type: ignore
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Any, Dict, Optional
+from app.config.constants import constants
 
-SECRET_KEY : str = "seu_segredo_aqui"
 ALGORITHM = "HS256"
 
-def create_access_token(user : User, expires_delta: Optional[timedelta] = None):
-  expire = None
-  to_encode = user.to_dict()
-  if expires_delta:
-    expire = datetime.now() + expires_delta
-  else:
-    expire = datetime.now() + timedelta(hours=24)
-  to_encode.update({'exp': expire})
-  encoded_jwt = jwt.encode(to_encode, str(SECRET_KEY), algorithm=ALGORITHM)
-  return encoded_jwt
+def create_access_token(user_id : int, expires_delta: Optional[timedelta] = None):
+    expire = datetime.now() + (expires_delta or timedelta(hours=24))
+    to_encode : Dict[str, Any] = {
+        "id": user_id,
+        "exp": expire
+    }
+    encoded_jwt = encode(to_encode, constants.SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def verify_token(token: str):
+    try:
+        payload = decode(token, constants.SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except ExpiredSignatureError:
+        raise Exception("Token expired")
+    except PyJWTError:
+        raise Exception("Token invalid")

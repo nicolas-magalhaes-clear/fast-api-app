@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.users_schemas import UserCreatePayload
-from ..models.user import User
+from ..models import User
 
 
 class UserService:
@@ -25,8 +25,8 @@ class UserService:
     result = await self.db.execute(statement)
     return result.scalars().first()
   
-  async def create(self, user: UserCreatePayload):
-    user = User(**user.model_dump())
+  async def create(self, user_data: UserCreatePayload):
+    user = User(**user_data.model_dump())
     self.db.add(user)
     await self.db.commit()
     await self.db.refresh(user) 
@@ -39,4 +39,5 @@ class UserService:
     await self.db.delete(user)
     await self.db.commit()
     return None
+  
   

@@ -1,8 +1,34 @@
-import os
+from enum import Enum
+from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-if DATABASE_URL is None:
-    raise ValueError("DATABASE_URL environment variable not set")
+
+class DatabaseSettings(BaseSettings):
+    DATABASE_URL: str
+
+
+class CryptSettings(BaseSettings):
+    SECRET_KEY: str
+
+
+class EnvironmentOption(str, Enum):
+    DEVELOPMENT = "development"
+    STAGING = "staging"
+    PRODUCTION = "production"
+
+
+class EnvironmentSettings(BaseSettings):
+    ENVIRONMENT: EnvironmentOption = EnvironmentOption.DEVELOPMENT
+
+
+class Constants(
+    DatabaseSettings,
+    CryptSettings,
+    EnvironmentSettings,
+):
+    pass
+
+
+constants = Constants()
