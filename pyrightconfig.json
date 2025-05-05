@@ -1,0 +1,7 @@
+{
+  "typeCheckingMode": "strict",
+  "include": ["app", "tests"],  // ajuste para suas pastas de código
+  "exclude": ["**/migrations", "**/__pycache__", "alembic", "alembic/env.py", ".venv"],
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false
+}
